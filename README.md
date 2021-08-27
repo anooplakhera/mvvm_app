@@ -1,4 +1,4 @@
-# mvvm_app
+# MVVM Practice
 
 27-Aug-2021 ->
 
