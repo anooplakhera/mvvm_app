@@ -2,7 +2,7 @@ package com.app.mvvmtask.ui.main.view
 
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.app.mvvmtask.R
 import com.app.mvvmtask.data.api.ApiInterface
@@ -13,10 +13,12 @@ import com.app.mvvmtask.databinding.ActivityMainBinding
 import com.app.mvvmtask.ui.base.BaseActivity
 import com.app.mvvmtask.ui.main.adapter.UserAdapter
 import com.app.mvvmtask.ui.main.viewmodel.UserViewModel
+import com.app.mvvmtask.utils.NetworkHandling
 import com.app.mvvmtask.utils.snackbar
 import com.app.mvvmtask.utils.visible
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserRepository>() {
@@ -29,25 +31,32 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
         CoroutineScope(Dispatchers.Main).launch { bindList(binding.rvUserList) }
 
         getUserList()
-        viewModel.recycleLoadMore(binding.rvUserList)
+        lifecycleScope.launch {
+            viewModel.recycleLoadMore(binding.rvUserList)
+        }
         observeUser()
     }
 
     private fun getUserList() {
-        viewModel.getUserList()
+        if (NetworkHandling.isNetworkConnected(this)) viewModel.getUserList()
     }
 
     private fun observeUser() {
-        viewModel.userLiveData?.observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> binding.progressIndicator.visible(true)
-                Status.SUCCESS -> {
-                    binding.progressIndicator.visible(false)
-                    notifyList(it.data!!.data)
+        lifecycleScope.launchWhenStarted {
+            viewModel.apiStateFlow?.collect {
+                when (it.status) {
+                    Status.LOADING -> binding.progressIndicator.visible(true)
+                    Status.SUCCESS -> {
+                        binding.progressIndicator.visible(false)
+                        notifyList(it.data!!.data)
+                    }
+                    Status.ERROR -> {
+                        binding.progressIndicator.visible(false)
+                        NetworkHandling.showNetworkError(this@MainActivity, it.throwable!!)
+                    }
                 }
-                Status.ERROR -> binding.progressIndicator.visible(false)
             }
-        })
+        }
     }
 
     private fun notifyList(data: ArrayList<UserResponse.Data>?) {
