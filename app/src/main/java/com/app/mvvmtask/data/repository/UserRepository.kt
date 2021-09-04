@@ -7,8 +7,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
-class UserRepository(val apiService: ApiService) : BaseRepository() {
+class UserRepository @Inject constructor(private val apiService: ApiService) : BaseRepository() {
 
     var mPage = 1
 

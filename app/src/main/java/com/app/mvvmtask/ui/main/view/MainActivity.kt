@@ -1,12 +1,12 @@
 package com.app.mvvmtask.ui.main.view
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.app.mvvmtask.R
 import com.app.mvvmtask.data.model.UserResponse
-import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.databinding.ActivityMainBinding
 import com.app.mvvmtask.ui.base.BaseActivity
 import com.app.mvvmtask.ui.main.adapter.UserAdapter
@@ -15,27 +15,27 @@ import com.app.mvvmtask.utils.NetworkHandling
 import com.app.mvvmtask.utils.SealedClasses.Status
 import com.app.mvvmtask.utils.snackbar
 import com.app.mvvmtask.utils.visible
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserRepository>() {
+@AndroidEntryPoint
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     var mAdapter: UserAdapter? = null
+
+    val viewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         CoroutineScope(Dispatchers.Main).launch { bindList(binding.rvUserList) }
 
-        getUserList()
+        if (NetworkHandling.isNetworkConnected(this)) viewModel.getUser()
         viewModel.recycleLoadMore(binding.rvUserList)
         observeUser()
-    }
-
-    private fun getUserList() {
-        if (NetworkHandling.isNetworkConnected(this)) viewModel.getUser()
     }
 
     private fun observeUser() {
@@ -60,8 +60,10 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
     private fun notifyList(data: ArrayList<UserResponse.Data>?) {
         binding.apply {
             data?.let {
-                if (it.size > 0) mAdapter!!.addList(it)
-                else mainLayout.snackbar("No Data Found")
+                if (it.size > 0) {
+                    viewModel.isLoading = true
+                    mAdapter!!.addList(it)
+                } else mainLayout.snackbar("No Data Found")
             } ?: mainLayout.snackbar("No Data Found")
         }
     }
@@ -74,11 +76,7 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
         }
     }
 
-    override fun getViewModel(): Class<UserViewModel> = UserViewModel::class.java
-
     override fun getActivityBinding(): ActivityMainBinding =
         DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
-
-    override fun getActivityRepository(): UserRepository = UserRepository(apiService)
 
 }

@@ -6,11 +6,14 @@ import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.ui.base.BaseViewModel
 import com.app.mvvmtask.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel() {
+@HiltViewModel
+class UserViewModel @Inject constructor(private val userRepo: UserRepository) : BaseViewModel() {
 
     var isLoading: Boolean = false
 
@@ -19,12 +22,11 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
     val userStateFlow: StateFlow<Resource<UserResponse>> = _userStateFlow
 
     fun getUser() = viewModelScope.launch {
-        networkCallRepo.getUser().onStart {
+        userRepo.getUser().onStart {
             _userStateFlow.value = Resource.loading(null)
         }.catch { e ->
             _userStateFlow.value = Resource.error(e, null)
         }.collect {
-            if (it.data.size > 0) isLoading = true
             _userStateFlow.value = Resource.success(it)
         }
     }
@@ -40,7 +42,7 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
                                 if (isLoading) {
                                     isLoading = false
                                     delay(200)
-                                    networkCallRepo.loadMore()
+                                    userRepo.loadMore()
                                     getUser()
                                 }
                             }
