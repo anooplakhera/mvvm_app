@@ -20,18 +20,18 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
     val apiStateFlow: StateFlow<Resource<UserResponse>> = _apiStateFlow
 
     @SuppressLint("CheckResult")
-    fun getUserList() = viewModelScope.launch {
-        networkCallRepo!!.getUserList().onStart {
+    fun getUser() = viewModelScope.launch {
+        networkCallRepo.getUser().onStart {
             _apiStateFlow.value = Resource.loading(null)
         }.catch { e ->
             _apiStateFlow.value = Resource.error(e, null)
         }.collect {
-            if (it.data?.size > 0) isLoading = true
+            if (it.data.size > 0) isLoading = true
             _apiStateFlow.value = Resource.success(it)
         }
     }
 
-    suspend fun recycleLoadMore(rvList: RecyclerView) = viewModelScope.launch {
+    fun recycleLoadMore(rvList: RecyclerView) {
         rvList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -41,8 +41,9 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
                             viewModelScope.launch {
                                 if (isLoading) {
                                     isLoading = false
-//                                    delay(500)
+                                    delay(500)
                                     networkCallRepo.loadMore()
+                                    getUser()
                                 }
                             }
                         }

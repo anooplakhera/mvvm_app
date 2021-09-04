@@ -5,7 +5,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.app.mvvmtask.R
-import com.app.mvvmtask.data.api.ApiInterface
 import com.app.mvvmtask.data.api.Status
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
@@ -31,19 +30,17 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
         CoroutineScope(Dispatchers.Main).launch { bindList(binding.rvUserList) }
 
         getUserList()
-        lifecycleScope.launch {
-            viewModel.recycleLoadMore(binding.rvUserList)
-        }
+        viewModel.recycleLoadMore(binding.rvUserList)
         observeUser()
     }
 
     private fun getUserList() {
-        if (NetworkHandling.isNetworkConnected(this)) viewModel.getUserList()
+        if (NetworkHandling.isNetworkConnected(this)) viewModel.getUser()
     }
 
     private fun observeUser() {
         lifecycleScope.launchWhenStarted {
-            viewModel.apiStateFlow?.collect {
+            viewModel.apiStateFlow.collect {
                 when (it.status) {
                     Status.LOADING -> binding.progressIndicator.visible(true)
                     Status.SUCCESS -> {
@@ -60,16 +57,18 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
     }
 
     private fun notifyList(data: ArrayList<UserResponse.Data>?) {
-        data?.let {
-            if (it.size > 0) mAdapter!!.addList(it)
-            else binding.mainLayout.snackbar("No Data Found")
-        } ?: binding.mainLayout.snackbar("No Data Found")
+        binding.apply {
+            data?.let {
+                if (it.size > 0) mAdapter!!.addList(it)
+                else mainLayout.snackbar("No Data Found")
+            } ?: mainLayout.snackbar("No Data Found")
+        }
     }
 
     private fun bindList(rvList: RecyclerView) {
         val mList = ArrayList<UserResponse.Data>()
         rvList.apply {
-            mAdapter = UserAdapter(mList!!) {}
+            mAdapter = UserAdapter(mList) {}
             adapter = mAdapter
         }
     }
@@ -79,7 +78,6 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
     override fun getActivityBinding(): ActivityMainBinding =
         DataBindingUtil.setContentView(this@MainActivity, R.layout.activity_main)
 
-    override fun getActivityRepository(): UserRepository =
-        UserRepository(this, apiClient.getAPI(ApiInterface::class.java))
+    override fun getActivityRepository(): UserRepository = UserRepository(apiService)
 
 }

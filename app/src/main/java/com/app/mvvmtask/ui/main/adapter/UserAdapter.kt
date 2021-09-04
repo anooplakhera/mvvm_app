@@ -32,7 +32,7 @@ class UserAdapter(val mList: ArrayList<UserResponse.Data>, var itemClick: (Int) 
             binding.user = user
             binding.executePendingBindings()
             Glide.with(itemView.context).load(user.avatar).circleCrop().into(binding.imgUserImage)
-            binding.rytMain.setOnClickListener { itemClick(adapterPosition) }
+            binding.rytMain.setOnClickListener { itemClick(bindingAdapterPosition) }
         }
     }
 }

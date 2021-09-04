@@ -3,8 +3,7 @@ package com.app.mvvmtask.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import com.app.mvvmtask.R
-import com.app.mvvmtask.ui.base.BaseActivity
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
+import io.ktor.client.statement.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,9 +13,8 @@ import java.net.SocketTimeoutException
 object NetworkHandling {
 
     fun showNetworkError(context: Context, exception: Throwable) {
-        if (exception is HttpException) {
-            val error: HttpException = exception
-            when (exception.code()) {
+        if (exception is HttpResponse) {
+            when (exception.status.value) {
                 503 -> {
                     CoroutineScope(Dispatchers.Main).launch {
                         context.apply { showToast(this, getString(R.string.server_error)) }
