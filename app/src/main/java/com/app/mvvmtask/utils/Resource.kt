@@ -1,4 +1,6 @@
-package com.app.mvvmtask.data.api
+package com.app.mvvmtask.utils
+
+import com.app.mvvmtask.utils.SealedClasses.Status
 
 class Resource<out T>(val status: Status, val data: T?, val throwable: Throwable?) {
 

@@ -5,7 +5,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.app.mvvmtask.R
-import com.app.mvvmtask.data.api.Status
+import com.app.mvvmtask.utils.SealedClasses.Status
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.databinding.ActivityMainBinding

@@ -3,7 +3,7 @@ package com.app.mvvmtask.ui.main.viewmodel
 import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import com.app.mvvmtask.data.api.Resource
+import com.app.mvvmtask.utils.Resource
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.ui.base.BaseViewModel

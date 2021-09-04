@@ -1,4 +1,4 @@
-package com.app.mvvmtask.data.api
+package com.app.mvvmtask.utils.SealedClasses
 
 enum class Status {
     SUCCESS,
