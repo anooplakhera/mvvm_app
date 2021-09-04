@@ -14,11 +14,9 @@ class UserRepository(val apiService: ApiService) : BaseRepository() {
     var mPage = 1
 
     @SuppressLint("CheckResult")
-    suspend fun getUser(): Flow<UserResponse> {
-        return flow {
-            emit(apiService.getUser(mPage))
-        }.flowOn(Dispatchers.IO)
-    }
+    suspend fun getUser(): Flow<UserResponse> = flow {
+        emit(apiService.getUser(mPage))
+    }.flowOn(Dispatchers.IO)
 
     fun loadMore() {
         mPage += 1
