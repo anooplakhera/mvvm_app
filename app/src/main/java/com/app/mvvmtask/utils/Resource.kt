@@ -18,6 +18,10 @@ class Resource<out T>(val status: Status, val data: T?, val throwable: Throwable
             return Resource(Status.LOADING, data, null)
         }
 
+        fun <T> empty(data: T?): Resource<T> {
+            return Resource(Status.EMPTY, data, null)
+        }
+
     }
 
 }

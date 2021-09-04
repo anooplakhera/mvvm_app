@@ -5,7 +5,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.app.mvvmtask.R
-import com.app.mvvmtask.utils.SealedClasses.Status
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.databinding.ActivityMainBinding
@@ -13,6 +12,7 @@ import com.app.mvvmtask.ui.base.BaseActivity
 import com.app.mvvmtask.ui.main.adapter.UserAdapter
 import com.app.mvvmtask.ui.main.viewmodel.UserViewModel
 import com.app.mvvmtask.utils.NetworkHandling
+import com.app.mvvmtask.utils.SealedClasses.Status
 import com.app.mvvmtask.utils.snackbar
 import com.app.mvvmtask.utils.visible
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +51,7 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
                         binding.progressIndicator.visible(false)
                         NetworkHandling.showNetworkError(this@MainActivity, it.throwable!!)
                     }
+                    Status.EMPTY -> Unit
                 }
             }
         }

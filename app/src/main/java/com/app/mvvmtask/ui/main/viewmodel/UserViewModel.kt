@@ -15,7 +15,7 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
     var isLoading: Boolean = false
 
     private val _userStateFlow: MutableStateFlow<Resource<UserResponse>> =
-        MutableStateFlow(Resource.loading(null))
+        MutableStateFlow(Resource.empty(null))
     val userStateFlow: StateFlow<Resource<UserResponse>> = _userStateFlow
 
     fun getUser() = viewModelScope.launch {
