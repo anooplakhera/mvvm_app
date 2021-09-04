@@ -1,6 +1,5 @@
 package com.app.mvvmtask.data.repository
 
-import android.annotation.SuppressLint
 import com.app.mvvmtask.data.api.ApiService
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.ui.base.BaseRepository
@@ -13,7 +12,6 @@ class UserRepository(val apiService: ApiService) : BaseRepository() {
 
     var mPage = 1
 
-    @SuppressLint("CheckResult")
     suspend fun getUser(): Flow<UserResponse> = flow {
         emit(apiService.getUser(mPage))
     }.flowOn(Dispatchers.IO)

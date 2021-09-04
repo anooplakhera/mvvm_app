@@ -40,7 +40,7 @@ class MainActivity : BaseActivity<UserViewModel, ActivityMainBinding, UserReposi
 
     private fun observeUser() {
         lifecycleScope.launchWhenStarted {
-            viewModel.apiStateFlow.collect {
+            viewModel.userStateFlow.collect {
                 when (it.status) {
                     Status.LOADING -> binding.progressIndicator.visible(true)
                     Status.SUCCESS -> {

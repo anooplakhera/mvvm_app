@@ -1,12 +1,11 @@
 package com.app.mvvmtask.ui.main.viewmodel
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import com.app.mvvmtask.utils.Resource
 import com.app.mvvmtask.data.model.UserResponse
 import com.app.mvvmtask.data.repository.UserRepository
 import com.app.mvvmtask.ui.base.BaseViewModel
+import com.app.mvvmtask.utils.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,19 +14,18 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
 
     var isLoading: Boolean = false
 
-    private val _apiStateFlow: MutableStateFlow<Resource<UserResponse>> =
+    private val _userStateFlow: MutableStateFlow<Resource<UserResponse>> =
         MutableStateFlow(Resource.loading(null))
-    val apiStateFlow: StateFlow<Resource<UserResponse>> = _apiStateFlow
+    val userStateFlow: StateFlow<Resource<UserResponse>> = _userStateFlow
 
-    @SuppressLint("CheckResult")
     fun getUser() = viewModelScope.launch {
         networkCallRepo.getUser().onStart {
-            _apiStateFlow.value = Resource.loading(null)
+            _userStateFlow.value = Resource.loading(null)
         }.catch { e ->
-            _apiStateFlow.value = Resource.error(e, null)
+            _userStateFlow.value = Resource.error(e, null)
         }.collect {
             if (it.data.size > 0) isLoading = true
-            _apiStateFlow.value = Resource.success(it)
+            _userStateFlow.value = Resource.success(it)
         }
     }
 
@@ -41,7 +39,7 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
                             viewModelScope.launch {
                                 if (isLoading) {
                                     isLoading = false
-                                    delay(500)
+                                    delay(200)
                                     networkCallRepo.loadMore()
                                     getUser()
                                 }
@@ -52,6 +50,5 @@ class UserViewModel(private val networkCallRepo: UserRepository) : BaseViewModel
             }
         })
     }
-
 
 }
