@@ -1,5 +1,6 @@
 package com.app.mvvmtask.ui.main.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
@@ -71,7 +72,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun bindList(rvList: RecyclerView) {
         val mList = ArrayList<UserResponse.Data>()
         rvList.apply {
-            mAdapter = UserAdapter(mList) {}
+            mAdapter = UserAdapter(mList) {
+                startActivity(Intent(this@MainActivity, UserDetailsActivity::class.java).apply {
+                    putExtra("userId", mList[it].id)
+                })
+            }
             adapter = mAdapter
         }
     }
