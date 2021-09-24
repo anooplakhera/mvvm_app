@@ -96,6 +96,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$dagger_hilt"
     kapt "com.google.dagger:hilt-android-compiler:$dagger_hilt"
 
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     //Others
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
 

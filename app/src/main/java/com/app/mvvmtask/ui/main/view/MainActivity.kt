@@ -21,19 +21,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    var mAdapter: UserAdapter? = null
-
+    @Inject
+    lateinit var mAdapter: UserAdapter
+    var userList = ArrayList<UserResponse.Data>()
     val viewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         CoroutineScope(Dispatchers.Main).launch { bindList(binding.rvUserList) }
-
+        userList = ArrayList()
         if (NetworkHandling.isNetworkConnected(this)) viewModel.getUser()
         viewModel.recycleLoadMore(binding.rvUserList)
         observeUser()
@@ -63,21 +65,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             data?.let {
                 if (it.size > 0) {
                     viewModel.isLoading = true
-                    mAdapter!!.addList(it)
+                    userList.addAll(it)
+                    mAdapter.submitList(userList.toMutableList())
                 } else mainLayout.snackbar("No Data Found")
             } ?: mainLayout.snackbar("No Data Found")
         }
     }
 
     private fun bindList(rvList: RecyclerView) {
-        val mList = ArrayList<UserResponse.Data>()
-        rvList.apply {
-            mAdapter = UserAdapter(mList) {
-                startActivity(Intent(this@MainActivity, UserDetailsActivity::class.java).apply {
-                    putExtra("userId", mList[it].id)
-                })
-            }
-            adapter = mAdapter
+        rvList.adapter = mAdapter
+        mAdapter.setOnContainerClickListener {
+            startActivity(Intent(this@MainActivity, UserDetailsActivity::class.java).apply {
+                putExtra("userId", it.id)
+            })
         }
     }
 

@@ -3,6 +3,7 @@ package com.app.mvvmtask
 import android.content.Context
 import androidx.room.Room
 import com.app.mvvmtask.data.db.DatabaseHelper
+import com.app.mvvmtask.ui.main.adapter.UserAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,5 +23,9 @@ object AppModule {
     @Singleton
     @Provides
     fun getUserDetailDao(db: DatabaseHelper) = db.userDetailsDao()
+
+    @Singleton
+    @Provides
+    fun getUserAdapter(): UserAdapter = UserAdapter()
 
 }
