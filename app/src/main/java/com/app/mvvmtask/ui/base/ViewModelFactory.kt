@@ -14,7 +14,6 @@ class ViewModelFactory(private val repository: BaseRepository) :
             modelClass.isAssignableFrom(UserViewModel::class.java) -> UserViewModel(
                 repository as UserRepository
             ) as T
-
             else -> throw IllegalArgumentException("ViewModelClass Not Found")
         }
     }
